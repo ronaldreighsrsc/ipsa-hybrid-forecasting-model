@@ -121,8 +121,9 @@ class FractionalDifferencer:
                 width = len(self._get_weights_ffd(d_optimo)) - 1
                 print(f"  [FINAL] {nueva_col} salvada con d={d_optimo:.2f} (Ventana: {width} días, Corr: {corr:.4f}).")
                 
-                # Agendar la original para su destrucción
-                cols_to_drop.append(col)
+                # Agendar la original para su destrucción (Excepto precios crudos para el backtest real)
+                if col not in ['Price', 'Open', 'High', 'Low']:
+                    cols_to_drop.append(col)
 
         # 3. Destrucción de no-estacionarias y Limpieza de NaNs
         df_calc = df_calc.drop(columns=cols_to_drop)

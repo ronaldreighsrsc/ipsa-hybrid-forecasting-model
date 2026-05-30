@@ -50,7 +50,7 @@ XGB_GRID = [
     {'n_estimators': 150, 'max_depth': 5, 'learning_rate': 0.01, 'subsample': 0.8}
 ]
 
-# LSTM / BiLSTM / LSTM-RF
+# LSTM / BiLSTM / LSTM_RF
 NN_GRID = [
     {'units': 32, 'dropout': 0.2},
     {'units': 64, 'dropout': 0.3}
@@ -65,7 +65,7 @@ bancos = {
     "Macros": ['TPM', 'EMBI', 'Copper_FFD', 'Yield10Y_FFD'],
     "Tecnicos": ['MACD_Hist', 'RSI', 'ATR', 'EGARCH_Vol'],
     "Precio_Puro": ['Open_FFD', 'High_FFD', 'Low_FFD'],
-    "Hibrido_Precio_Tec": ['Open_FFD', 'High_FFD', 'Low_Vol', 'EGARCH_Vol', 'RSI'],
+    "Hibrido_Precio_Tec": ['Open_FFD', 'High_FFD', 'Low_FFD', 'EGARCH_Vol', 'RSI'],
     "Global": ['SP500_FFD', 'VIX', 'FXI'],
     "Kitchen_Sink_Total": ['SP500_FFD', 'FXI', 'USDCLP_FFD', 'Yield10Y_FFD', 
                            'EMBI', 'VIX', 'TPM', 'Copper_FFD', 'MACD_Hist', 
