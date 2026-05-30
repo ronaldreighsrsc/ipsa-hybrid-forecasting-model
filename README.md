@@ -1,6 +1,6 @@
 # IPSA Hybrid Forecasting Model
 
-This repository contains the codebase architecture for a master's/undergraduate thesis on predictive modeling and backtesting of the IPSA (Índice de Precio Selectivo de Acciones) stock index.
+This repository contains the codebase architecture for a master's/undergraduate thesis on predictive modeling and backtesting of the IPSA stock index.
 
 The project compares classical statistical models (ARIMAX), Machine Learning algorithms (Random Forest, XGBoost), Deep Learning architectures (LSTM, BiLSTM), and sequential Hybrid Models. It evaluates their directional predictive capabilities under realistic financial constraints.
 
