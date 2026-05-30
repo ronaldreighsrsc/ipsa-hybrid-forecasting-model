@@ -26,14 +26,7 @@ def run_preprocessing_pipeline():
 
     print("\n--- PASO 4: Estacionariedad y Memoria (FFD) ---")
     differencer = FractionalDifferencer(threshold=1e-4)
-    
-    # Protegemos las columnas que NO deben sufrir diferenciación fraccionaria
-    # (Fechas, indicadores que ya son estacionarios, y volatilidad calculada)
-    columnas_intocables = [
-        'Date', 'MACD', 'MACD_Signal', 'MACD_Hist', 'RSI', 'ATR', 
-        'EGARCH_Vol', 'TPM', 'VIX', 'Yield10Y', 'Spread_10Y_3M'
-    ]
-    df_final = differencer.apply_ffd(df, columns_to_ignore=columnas_intocables)
+    df_final = differencer.apply_ffd(df)
 
     print("\n--- PASO 5: Guardando Resultados ---")
     # Creamos la carpeta processed si por algún motivo no existe

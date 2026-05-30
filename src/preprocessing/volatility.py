@@ -9,7 +9,7 @@ class VolatilityModeler:
     """
     Calcula la volatilidad condicional de la serie financiera usando un modelo EGARCH
     con ventana móvil (Rolling Window). Implementa un sistema de respaldo (fallback)
-    hacia GARCH simple o Volatilidad Histórica en caso de inestabilidad matemática.
+    hacia GARCH simple o Volatilidad Histórica en caso de inestabilidad matemática.500 días suele ser un estándar
     """
     def __init__(self, window_size: int = 500, target_col: str = 'Price'):
         """
@@ -21,6 +21,11 @@ class VolatilityModeler:
         self.target_col = target_col
 
     def compute_egarch(self, df: pd.DataFrame) -> pd.DataFrame:
+
+        # ---> BARRERA DE SEGURIDAD (Fail-Fast) <---
+        if len(df) <= self.window_size:
+            raise ValueError(f"Error Crítico: Los datos tienen {len(df)} filas, pero el modelo necesita al menos {self.window_size + 1} días para iniciar la ventana móvil.")
+
         print(f"Calculando Volatilidad Condicional EGARCH (Ventana: {self.window_size} días)...")
         print("⏳ Esto puede tomar un par de minutos debido a las iteraciones matemáticas de la ventana móvil.")
         

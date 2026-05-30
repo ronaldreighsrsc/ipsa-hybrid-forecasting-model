@@ -10,13 +10,23 @@ class FractionalDifferencer:
     Asegura la estacionariedad de las series de tiempo financieras sin perder 
     la memoria de largo plazo utilizando Diferenciación Fraccionaria (FFD).
     """
-    def __init__(self, threshold: float = 1e-4, p_value_limit: float = 0.05):
+    def __init__(self, threshold: float = 1e-4, p_value_limit: float = 0.05, protected_columns: list = None):
         """
         :param threshold: Umbral para descartar pesos pequeños y evitar perder demasiados datos.
         :param p_value_limit: Límite del Test de Dickey-Fuller (5% por defecto).
+        :param protected_columns: Variables de "Nivel" o "Régimen" que no deben diferenciarse.
         """
         self.threshold = threshold
         self.p_value_limit = p_value_limit
+        
+        # GRUPO A: Variables de "Nivel" o "Régimen" (NO TOCAR)
+        # - TPM: Es una variable de política (escalones). Diferenciarla destruye la info del nivel de tasas.
+        # - Indicadores (RSI, CCI, MACD): Construidos para ser osciladores estacionarios.
+        # - Volatilidad (EGARCH, ATR): Es una medida de varianza, no un precio.
+        if protected_columns is None:
+            self.protected_columns = ['Date', 'TPM', 'MACD', 'MACD_Signal', 'MACD_Hist', 'RSI', 'ATR', 'EGARCH_Vol']
+        else:
+            self.protected_columns = protected_columns
 
     def _get_weights_ffd(self, d: float) -> np.ndarray:
         """Calcula los pesos iterativos de la diferenciación fraccional."""
@@ -44,24 +54,42 @@ class FractionalDifferencer:
             
         return pd.Series(ffd_vals, index=df_series.index)
 
-    def _find_optimal_d(self, series: pd.Series) -> float:
+    def _find_optimal_d(self, series: pd.Series) -> tuple:
         """
         Busca el valor mínimo de d (entre 0.0 y 1.0) que hace que la serie 
         pase el test de Dickey-Fuller (p-value < 0.05) preservando máxima memoria.
+        Retorna (d_optimo, correlacion_con_original).
         """
-        # Hacemos una búsqueda lineal en saltos de 0.05
-        for d in np.linspace(0.0, 1.0, 21): 
-            df_ffd = self._frac_diff_ffd(series, d).dropna()
-            if len(df_ffd) > 20: # Seguridad: asegurar que queden datos tras el FFD
-                p_val = adfuller(df_ffd)[1]
+        series_clean = series.ffill().dropna()
+        
+        for d in np.linspace(0.0, 1.0, 40):
+            df_ffd = self._frac_diff_ffd(series_clean, d).dropna()
+            if len(df_ffd) < 100: # Conservador: mínimo 100 obs para un ADF fiable
+                continue
+            
+            try:
+                p_val = adfuller(df_ffd.values.flatten(), autolag='AIC')[1]
+                
                 if p_val <= self.p_value_limit:
-                    return d
-        return 1.0 # Si no logra estacionariedad, cae a diferenciación entera (d=1)
+                    # Calcular correlación con serie original para medir memoria preservada
+                    original_aligned = series_clean.loc[df_ffd.index]
+                    corr = np.corrcoef(
+                        original_aligned.values.flatten(),
+                        df_ffd.values.flatten()
+                    )[0, 1]
+                    return d, corr
+            except Exception:
+                continue
+                
+        return 1.0, 0.0 # Fallback: diferenciación entera, sin memoria preservada
 
-    def apply_ffd(self, df: pd.DataFrame, columns_to_ignore: list) -> pd.DataFrame:
+    def apply_ffd(self, df: pd.DataFrame, columns_to_ignore: list = None) -> pd.DataFrame:
         """
         Método público: Evalúa columnas, aplica FFD a las rebeldes y devuelve el DF limpio.
         """
+        if columns_to_ignore is None:
+            columns_to_ignore = self.protected_columns
+            
         df_calc = df.copy()
         cols_to_drop = []
         
@@ -73,8 +101,11 @@ class FractionalDifferencer:
                 continue
                 
             serie_limpia = df_calc[col].dropna()
-            # 1. Test Dickey-Fuller Aumentado
-            p_value = adfuller(serie_limpia)[1]
+            # 1. Test Dickey-Fuller Aumentado (Pre-Check)
+            try:
+                p_value = adfuller(serie_limpia)[1]
+            except Exception:
+                p_value = 1.0 # Si falla, asumir no estacionaria para forzar búsqueda de d*
             
             if p_value < self.p_value_limit:
                 print(f"  [SKIP] {col} YA es estacionaria (p={p_value:.4f}).")
@@ -82,13 +113,13 @@ class FractionalDifferencer:
                 print(f"  [PROCESAR] {col} NO es estacionaria (p={p_value:.4f}). Buscando d*...")
                 
                 # 2. Encontrar d óptimo y aplicar FFD
-                d_optimo = self._find_optimal_d(serie_limpia)
+                d_optimo, corr = self._find_optimal_d(serie_limpia)
                 nueva_col = f"{col}_FFD"
                 df_calc[nueva_col] = self._frac_diff_ffd(serie_limpia, d_optimo)
                 
-                # Reporte de pérdida de ventana
+                # Reporte de pérdida de ventana y memoria preservada
                 width = len(self._get_weights_ffd(d_optimo)) - 1
-                print(f"  [FINAL] {nueva_col} salvada con d={d_optimo:.2f} (Ventana perdida: {width} días).")
+                print(f"  [FINAL] {nueva_col} salvada con d={d_optimo:.2f} (Ventana: {width} días, Corr: {corr:.4f}).")
                 
                 # Agendar la original para su destrucción
                 cols_to_drop.append(col)
