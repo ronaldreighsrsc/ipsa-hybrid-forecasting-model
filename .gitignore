@@ -1,0 +1,9 @@
+# Entorno virtual
+venv/
+__pycache__/
+
+# No subir bases de datos corporativas a internet por seguridad
+data/
+
+# Archivos ocultos del sistema
+.DS_Store
