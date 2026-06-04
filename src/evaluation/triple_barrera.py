@@ -11,7 +11,7 @@ class TripleBarrierBacktester:
     """
     Motor de Backtesting Financiero.
     Simula inversiones reales usando las probabilidades generadas por los modelos,
-    aplicando comisiones, slippage y límites dinámicos de volatilidad.
+    aplicando comisiones, slippage y límites de volatilidad.
     """
     def __init__(self, data_path: str, results_dir: str):
         self.data_path = data_path
@@ -57,7 +57,6 @@ class TripleBarrierBacktester:
 
     def simulate_trades(self, df, probabilities):
         """Simula las operaciones día a día evaluando las 3 barreras."""
-        # Manejo dinámico del nombre de las columnas según lo que haya escupido el FFD
         col_price = 'Price' if 'Price' in df.columns else 'Price_FFD'
         col_open = 'Open' if 'Open' in df.columns else 'Open_FFD'
         col_high = 'High' if 'High' in df.columns else 'High_FFD'
@@ -122,7 +121,6 @@ class TripleBarrierBacktester:
             campeon_actual = None
             
             for banco in bancos:
-                # Rutas que coinciden con el main_ablation.py
                 file_name = os.path.join(self.results_dir, f'probs_{modelo.lower()}_{banco}.npy')
                 
                 if os.path.exists(file_name):

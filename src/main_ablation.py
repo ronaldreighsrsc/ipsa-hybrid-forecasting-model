@@ -22,13 +22,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # ==============================================================================
 # Modelos disponibles: 'ARIMAX', 'RANDOM_FOREST', 'XGBOOST', 'LSTM', 'BILSTM', 'ARIMA_LSTM', 'LSTM_RF'
 MODELOS_A_CORRER = [
-    'ARIMAX', 
-    'RANDOM_FOREST', 
-    # 'XGBOOST', 
-    # 'LSTM', 
-    # 'BILSTM', 
-    # 'ARIMA_LSTM', 
-    # 'LSTM_RF'
+    #'ARIMAX', 
+    #'RANDOM_FOREST', 
+    #'XGBOOST', 
+    'LSTM'
+    #'BILSTM', 
+    #'ARIMA_LSTM', 
+    #'LSTM_RF'
 ]
 
 # Configura aquí el nombre de la variable a predecir
@@ -52,8 +52,8 @@ XGB_GRID = [
 
 # LSTM / BiLSTM / LSTM_RF
 NN_GRID = [
-    {'units': 32, 'dropout': 0.2},
-    {'units': 64, 'dropout': 0.3}
+    {'units': 50, 'dropout': 0.2},
+    {'units': 100, 'dropout': 0.3}
 ]
 # Nota: ARIMAX y ARIMA_LSTM hacen su propia búsqueda por AIC internamente.
 
@@ -85,10 +85,10 @@ def run_ablation():
     df_base = df_base.sort_values('Date').set_index('Date')
     
     # Validar que exista el Target
+    global TARGET_COL
     if TARGET_COL not in df_base.columns:
         print(f"⚠️ TARGET_COL '{TARGET_COL}' no encontrado. Columnas disponibles: {list(df_base.columns)}")
         print("Intentando usar 'Price' como fallback...")
-        global TARGET_COL
         TARGET_COL = 'Price'
 
     os.makedirs("./src/evaluation/results", exist_ok=True)

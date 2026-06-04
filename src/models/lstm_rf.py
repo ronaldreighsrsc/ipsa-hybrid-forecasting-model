@@ -66,15 +66,19 @@ class LSTMRFTrainer:
         return folds
 
     def _build_lstm_base(self, input_shape: tuple, units: int, dropout: float) -> Model:
-        """Construye el modelo completo, asegurando un nombre específico para la capa extractora."""
+        """Arquitectura profunda de 2 capas LSTM (alineada con LSTM standalone)."""
         input_layer = Input(shape=input_shape)
-        # Nombramos explícitamente esta capa para poder extraerla después
-        lstm_layer = LSTM(units, return_sequences=False, name='lstm_extractor')(input_layer)
-        dropout_layer = Dropout(dropout)(lstm_layer)
-        output_layer = Dense(1, activation='sigmoid')(dropout_layer) 
+        # Capa 1: LSTM profunda con return_sequences para alimentar la segunda capa
+        lstm_1 = LSTM(units, return_sequences=True)(input_layer)
+        drop_1 = Dropout(dropout)(lstm_1)
+        # Capa 2: LSTM compresora — nombrada explícitamente para extraerla después
+        lstm_2 = LSTM(units // 2, return_sequences=False, name='lstm_extractor')(drop_1)
+        drop_2 = Dropout(dropout)(lstm_2)
+        dense_1 = Dense(25, activation='relu')(drop_2)
+        output_layer = Dense(1, activation='sigmoid')(dense_1)
         
         model = Model(inputs=input_layer, outputs=output_layer)
-        model.compile(optimizer=Adam(learning_rate=0.001), loss='binary_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer=Adam(learning_rate=0.0001), loss='binary_crossentropy', metrics=['accuracy'])
         return model
 
     def find_best_params(self, X_train: np.ndarray, y_train: np.ndarray, lstm_grid: list) -> dict:
@@ -85,7 +89,7 @@ class LSTMRFTrainer:
         s_tr, t_steps, n_feat = X_train.shape
         temp_scaler = StandardScaler()
         X_train_scaled = np.clip(
-            temp_scaler.fit_transform(X_train.reshape(-1, n_feat)), -5, 5
+            temp_scaler.fit_transform(X_train.reshape(-1, n_feat)), -10, 10
         ).reshape(s_tr, t_steps, n_feat)
 
         folds = self._get_purged_embargoed_folds(s_tr)
@@ -100,7 +104,7 @@ class LSTMRFTrainer:
                 model_cv = self._build_lstm_base((t_steps, n_feat), units=params['units'], dropout=params['dropout'])
                 es = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True, verbose=0)
                 
-                model_cv.fit(X_train_scaled[train_idx], y_train[train_idx], epochs=10, batch_size=64, 
+                model_cv.fit(X_train_scaled[train_idx], y_train[train_idx], epochs=15, batch_size=32, 
                              validation_data=(X_train_scaled[val_idx], y_train[val_idx]), 
                              callbacks=[es], verbose=0, shuffle=False)
                 
@@ -128,12 +132,12 @@ class LSTMRFTrainer:
         s_te = X_test.shape[0]
 
         # Escalamiento Maestro
-        X_train_scaled = np.clip(self.scaler.fit_transform(X_train.reshape(-1, n_feat)), -5, 5).reshape(s_tr, t_steps, n_feat)
-        X_test_scaled = np.clip(self.scaler.transform(X_test.reshape(-1, n_feat)), -5, 5).reshape(s_te, t_steps, n_feat)
+        X_train_scaled = np.clip(self.scaler.fit_transform(X_train.reshape(-1, n_feat)), -10, 10).reshape(s_tr, t_steps, n_feat)
+        X_test_scaled = np.clip(self.scaler.transform(X_test.reshape(-1, n_feat)), -10, 10).reshape(s_te, t_steps, n_feat)
 
         # 1. Entrenar LSTM Base
         master_lstm = self._build_lstm_base((t_steps, n_feat), units=best_params['units'], dropout=best_params['dropout'])
-        master_lstm.fit(X_train_scaled, y_train, epochs=15, batch_size=64, verbose=0, shuffle=False)
+        master_lstm.fit(X_train_scaled, y_train, epochs=20, batch_size=32, verbose=0, shuffle=False)
 
         # 2. Mutilar el LSTM para convertirlo en Extractor
         feature_extractor = Model(inputs=master_lstm.inputs, outputs=master_lstm.get_layer('lstm_extractor').output)
