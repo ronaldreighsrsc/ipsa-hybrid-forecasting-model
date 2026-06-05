@@ -19,6 +19,7 @@ ipsa-hybrid-forecasting-model/
  |   |-- preprocessing/      # Block 1: ETL, Technical Features, Volatility (EGARCH), and FFD.
  |   |-- models/             # Predictive engine classes and Data Leakage prevention logic.
  |   |-- evaluation/         # Block 3: Correlation Analysis and Triple Barrier Backtesting.
+ |   |-- dashboard/          # Interactive Streamlit Dashboard (Data Visualization).
  |   |-- main_preprocessing.py # Block 1 Orchestrator
  |   |-- main_ablation.py      # Block 2 Orchestrator (Model Tournament)
  |   |-- main_evaluation.py    # Block 3 Orchestrator (Financial Results)
@@ -71,6 +72,13 @@ Checks for multicollinearity using a Pearson correlation matrix and evaluates th
 python src/main_evaluation.py
 ```
 *(Generates: An institutional ASCII summary table in the console and an Equity Curve vs. Benchmark plot).*
+
+### Interactive Dashboard (Visualization)
+Launches a **Streamlit** web application that serves as an interactive showcase for the project results. It allows non-technical stakeholders to explore the processed data (candlestick charts, EGARCH volatility, FFD), compare model performance from the ablation study, and review the correlation analysis — all through an intuitive point-and-click interface.
+```bash
+streamlit run src/dashboard/app.py
+```
+*(Opens a local web server at `http://localhost:8501` with interactive Plotly charts).*
 
 ---
 
