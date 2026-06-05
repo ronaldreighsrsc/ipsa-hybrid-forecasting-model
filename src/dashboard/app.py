@@ -51,7 +51,7 @@ if page == "Resumen del Proyecto":
     with col1:
         st.markdown("""
         ### Acerca del Proyecto
-        Este dashboard interactivo presenta los resultados de una tesis de grado/magíster enfocada en la predicción direccional del índice bursátil chileno (IPSA).
+        Este dashboard interactivo presenta los resultados de mi trabajo de final de carrera enfocado en la predicción direccional del índice bursátil chileno (IPSA).
         
         **El problema:** Predecir si el mercado subirá o bajará mañana es extremadamente difícil debido a la alta proporción de ruido vs señal.
         
@@ -71,7 +71,7 @@ if page == "Resumen del Proyecto":
 
 # --- Página 2: Exploración de Datos (EDA) ---
 elif page == "Exploración de Datos (EDA)":
-    st.markdown('<p class="main-title">Exploración del Dataset</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-title">Exploración del Test Dataset</p>', unsafe_allow_html=True)
     st.markdown("<br>", unsafe_allow_html=True)
     
     df = load_data()
@@ -113,16 +113,39 @@ elif page == "Exploración de Datos (EDA)":
         fig_candle = plot_candlestick(df_filtered)
         st.plotly_chart(fig_candle, width='stretch')
         
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader("Volatilidad Condicional (EGARCH)")
-            fig_vol = plot_line_chart(df, 'Date', ['EGARCH_Vol'], "Volatilidad Modelada", "Varianza")
-            st.plotly_chart(fig_vol, width='stretch')
-            
-        with col2:
-            st.subheader("Serie Estacionaria (Fraccional - FFD)")
-            fig_ffd = plot_line_chart(df, 'Date', ['Price_FFD'], "Diferenciación Fraccionaria", "Precio FFD")
-            st.plotly_chart(fig_ffd, width='stretch')
+        # --- Matriz de Correlación de Pearson ---
+        st.subheader("Diagnóstico de Multicolinealidad (Matriz de Pearson)")
+        
+        # Replicar la lógica exacta del script original de la tesis:
+        # Solo eliminar Date y MACD_Signal, conservar todas las demás (incluidas FFD)
+        drop_cols = ['Date', 'MACD_Signal']
+        df_corr = df.drop(columns=[c for c in drop_cols if c in df.columns], errors='ignore')
+        df_corr = df_corr.select_dtypes(include=['number'])
+        
+        # Eliminar precios crudos (redundantes con sus versiones FFD)
+        raw_price_cols = ['Price', 'High', 'Low', 'Open']
+        df_corr = df_corr.drop(columns=[c for c in raw_price_cols if c in df_corr.columns], errors='ignore')
+        
+        corr_matrix = df_corr.corr()
+        
+        import plotly.graph_objects as go
+        fig_corr = go.Figure(data=go.Heatmap(
+            z=corr_matrix.values,
+            x=corr_matrix.columns,
+            y=corr_matrix.columns,
+            colorscale='RdBu_r',   # coolwarm equivalente en Plotly
+            zmin=-1, zmax=1,
+            text=corr_matrix.round(2).values,
+            texttemplate='%{text}',
+            textfont={"size": 9},
+            hovertemplate='%{x} vs %{y}<br>Correlación: %{z:.4f}<extra></extra>'
+        ))
+        fig_corr.update_layout(
+            height=750,
+            xaxis_tickangle=-45,
+            yaxis_autorange='reversed'  # Para que la diagonal vaya de arriba-izq a abajo-der
+        )
+        st.plotly_chart(fig_corr, width='stretch')
             
     else:
         st.error("⚠️ No se pudo cargar el archivo de datos procesados. Por favor, ejecuta primero el Bloque 1 (Preprocesamiento).")
