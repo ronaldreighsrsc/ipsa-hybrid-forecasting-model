@@ -37,5 +37,10 @@ def plot_candlestick(df, title="Gráfico de Velas"):
                 high=df['High'],
                 low=df['Low'],
                 close=df['Price'])])
-    fig.update_layout(title=title, yaxis_title='Precio', xaxis_rangeslider_visible=False)
+    fig.update_layout(
+        title=title, 
+        yaxis_title='Precio', 
+        xaxis_rangeslider_visible=False
+    )
+    
     return fig

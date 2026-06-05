@@ -33,7 +33,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Navegación en la barra lateral
-st.sidebar.image("https://img.icons8.com/color/96/000000/line-chart.png", width=60)
+st.sidebar.image("https://img.icons8.com/color/96/000000/line-chart.png", width=80)
 st.sidebar.title("Navegación")
 page = st.sidebar.radio("Selecciona una sección:", 
                         ["Resumen del Proyecto", "Exploración de Datos (EDA)", "Estudio de Ablación", "Backtesting Financiero"])
@@ -79,8 +79,38 @@ elif page == "Exploración de Datos (EDA)":
     if df is not None:
         st.dataframe(df.tail(100), width='stretch')
         
+        # --- Filtros Interactivos ---
         st.subheader("Evolución Histórica del IPSA")
-        fig_candle = plot_candlestick(df)
+        
+        col_filt1, col_filt2 = st.columns([1, 2])
+        with col_filt1:
+            temporalidad = st.radio("Temporalidad de Velas:", ["Diario", "Semanal", "Mensual"], horizontal=True)
+        
+        with col_filt2:
+            min_date, max_date = df['Date'].min(), df['Date'].max()
+            rango_fechas = st.slider("Rango de Fechas (Auto-escala Eje Y):", 
+                                     min_value=min_date.date(), 
+                                     max_value=max_date.date(), 
+                                     value=(min_date.date(), max_date.date()))
+            
+        # Filtrar por fechas
+        df_filtered = df[(df['Date'].dt.date >= rango_fechas[0]) & (df['Date'].dt.date <= rango_fechas[1])].copy()
+        
+        # Resamplear si es necesario (OHLC)
+        if temporalidad != "Diario":
+            # Set Date as index for resampling
+            df_resampled = df_filtered.set_index('Date')
+            freq = 'W' if temporalidad == "Semanal" else 'ME'
+            
+            # OHLC Aggregation logic
+            df_filtered = df_resampled.resample(freq).agg({
+                'Open': 'first',
+                'High': 'max',
+                'Low': 'min',
+                'Price': 'last'  # Close
+            }).dropna().reset_index()
+            
+        fig_candle = plot_candlestick(df_filtered)
         st.plotly_chart(fig_candle, width='stretch')
         
         col1, col2 = st.columns(2)
