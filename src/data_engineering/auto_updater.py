@@ -15,7 +15,7 @@ RAW_DATA_DIR = os.path.join(BASE_DIR, 'data', 'raw')
 
 # Diccionario de Tickers de Yahoo Finance
 YF_TICKERS = {
-    'IPSA.csv': '^IPSA',
+    # 'IPSA.csv': '^IPSA', # yfinance API no provee historial correcto, solo el último día
     'S&P 500 Historical Data.csv': '^GSPC',
     'FXI ETF Stock Price History.csv': 'FXI',
     'USD_CLP Historical Data.csv': 'CLP=X',
@@ -36,8 +36,22 @@ def update_yfinance_data():
         print(f"Descargando datos recientes para {ticker}...")
         
         try:
-            # Descargar últimos 5 días para asegurar cruce
-            data = yf.download(ticker, period="5d", progress=False)
+            # Cargar archivo existente para saber la última fecha
+            df_existing = pd.read_csv(filepath)
+            
+            # Detectar formato de fecha del archivo existente
+            if '-' in str(df_existing['Date'].iloc[0]):
+                date_format = '%Y-%m-%d'
+            else:
+                date_format = '%m/%d/%Y'
+                
+            df_existing['Date'] = pd.to_datetime(df_existing['Date'], errors='coerce')
+            last_date = df_existing['Date'].max()
+            
+            # Descargar datos faltantes
+            start_date_str = (last_date + pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+            data = yf.download(ticker, start=start_date_str, progress=False)
+            
             if data.empty:
                 print(f"[WARNING] No se encontraron datos recientes para {ticker}.")
                 continue
@@ -50,17 +64,7 @@ def update_yfinance_data():
             data = data.reset_index()
             data['Date'] = pd.to_datetime(data['Date']).dt.tz_localize(None) # Quitar zona horaria
             
-            # Cargar archivo existente
-            df_existing = pd.read_csv(filepath)
-            
-            # Detectar formato de fecha del archivo existente
-            if '-' in str(df_existing['Date'].iloc[0]):
-                date_format = '%Y-%m-%d'
-            else:
-                date_format = '%m/%d/%Y'
-                
-            df_existing['Date'] = pd.to_datetime(df_existing['Date'], errors='coerce')
-            last_date = df_existing['Date'].max()
+            # Ya se cargó el archivo existente arriba
             
             # Filtrar datos nuevos
             new_data = data[data['Date'] > last_date]

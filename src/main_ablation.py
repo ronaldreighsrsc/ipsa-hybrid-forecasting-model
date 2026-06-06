@@ -22,12 +22,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # ==============================================================================
 # Modelos disponibles: 'ARIMAX', 'RANDOM_FOREST', 'XGBOOST', 'LSTM', 'BILSTM', 'ARIMA_LSTM', 'LSTM_RF'
 MODELOS_A_CORRER = [
-    'ARIMAX', 
+    #'ARIMAX', 
     #'RANDOM_FOREST', 
-    #'XGBOOST', 
-    #'LSTM',
-    #'BILSTM', 
-    'ARIMA_LSTM'
+    'XGBOOST', 
+    'LSTM'
+    #'BILSTM',
+    #'ARIMA_LSTM',
     #'LSTM_RF'
 ]
 
@@ -100,19 +100,19 @@ def run_ablation():
         
         # Instanciar el Trainer correspondiente
         if nombre_modelo == 'ARIMAX':
-            trainer = ARIMAXTrainer(p_values=[0, 1, 2, 5, 10], q_values=[0, 1, 2], retrain_step=50)
+            trainer = ARIMAXTrainer(p_values=[0, 1, 2, 5, 10], q_values=[0, 1, 2], retrain_step=60)
         elif nombre_modelo == 'RANDOM_FOREST':
-            trainer = RandomForestTrainer(look_back=60, retrain_step=50)
+            trainer = RandomForestTrainer(look_back=60, retrain_step=60)
         elif nombre_modelo == 'XGBOOST':
-            trainer = XGBoostTrainer(look_back=60, retrain_step=50)
+            trainer = XGBoostTrainer(look_back=60, retrain_step=60)
         elif nombre_modelo == 'LSTM':
-            trainer = LSTMTrainer(look_back=60, retrain_step=50)
+            trainer = LSTMTrainer(look_back=60, retrain_step=60)
         elif nombre_modelo == 'BILSTM':
-            trainer = BiLSTMTrainer(look_back=60, retrain_step=50)
+            trainer = BiLSTMTrainer(look_back=60, retrain_step=60)
         elif nombre_modelo == 'ARIMA_LSTM':
-            trainer = HybridARIMALSTMTrainer(look_back=60, retrain_step=50)
+            trainer = HybridARIMALSTMTrainer(look_back=60, retrain_step=60)
         elif nombre_modelo == 'LSTM_RF':
-            trainer = LSTMRFTrainer(look_back=60, retrain_step=50)
+            trainer = LSTMRFTrainer(look_back=60, retrain_step=60)
         else:
             print(f"❌ Modelo no reconocido: {nombre_modelo}")
             continue

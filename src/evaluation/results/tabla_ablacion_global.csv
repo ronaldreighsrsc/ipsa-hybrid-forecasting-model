@@ -1,50 +1,50 @@
 Modelo,Banco,Mejores_Params,Accuracy_Test
-ARIMAX,Global,Recuperado,0.6090308370044053
-ARIMAX,Hibrido_Precio_Tec,Recuperado,0.552863436123348
-ARIMAX,Kitchen_Sink_Total,Recuperado,0.5770925110132159
-ARIMAX,Macros,Recuperado,0.6189427312775331
-ARIMAX,Precio_Puro,Recuperado,0.5616740088105727
-ARIMAX,Tecnicos,Recuperado,0.579295154185022
-ARIMAX,Univariado,Recuperado,0.5764576457645765
-ARIMA_LSTM,Global,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.6035242290748899
-ARIMA_LSTM,Hibrido_Precio_Tec,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.5881057268722467
-ARIMA_LSTM,Kitchen_Sink_Total,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.5837004405286343
-ARIMA_LSTM,Macros,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.5814977973568282
-ARIMA_LSTM,Precio_Puro,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.6046255506607929
-ARIMA_LSTM,Tecnicos,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.5958149779735683
-ARIMA_LSTM,Univariado,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.592959295929593
-BILSTM,Global,"{'units': 50, 'dropout': 0.2}",0.5719063545150501
-BILSTM,Hibrido_Precio_Tec,"{'units': 50, 'dropout': 0.2}",0.5652173913043478
-BILSTM,Kitchen_Sink_Total,"{'units': 50, 'dropout': 0.2}",0.5752508361204013
-BILSTM,Macros,"{'units': 100, 'dropout': 0.3}",0.5875139353400223
-BILSTM,Precio_Puro,"{'units': 100, 'dropout': 0.3}",0.5763656633221851
-BILSTM,Tecnicos,"{'units': 50, 'dropout': 0.2}",0.5886287625418061
-BILSTM,Univariado,"{'units': 50, 'dropout': 0.2}",0.5841694537346711
-LSTM,Global,"{'units': 50, 'dropout': 0.2}",0.5484949832775919
-LSTM,Hibrido_Precio_Tec,"{'units': 100, 'dropout': 0.3}",0.5652173913043478
-LSTM,Kitchen_Sink_Total,"{'units': 100, 'dropout': 0.3}",0.5261984392419174
-LSTM,Macros,"{'units': 100, 'dropout': 0.3}",0.5551839464882943
-LSTM,Precio_Puro,"{'units': 100, 'dropout': 0.3}",0.5652173913043478
-LSTM,Tecnicos,"{'units': 50, 'dropout': 0.2}",0.5317725752508361
-LSTM,Univariado,"{'units': 100, 'dropout': 0.3}",0.5863991081382386
-LSTM_RF,Global,"{'units': 50, 'dropout': 0.2}",0.5128205128205128
-LSTM_RF,Hibrido_Precio_Tec,"{'units': 100, 'dropout': 0.3}",0.5719063545150501
-LSTM_RF,Kitchen_Sink_Total,"{'units': 50, 'dropout': 0.2}",0.5250836120401338
-LSTM_RF,Macros,"{'units': 50, 'dropout': 0.2}",0.5217391304347826
-LSTM_RF,Precio_Puro,"{'units': 50, 'dropout': 0.2}",0.5507246376811594
-LSTM_RF,Tecnicos,"{'units': 100, 'dropout': 0.3}",0.5395763656633222
-LSTM_RF,Univariado,"{'units': 100, 'dropout': 0.3}",0.5663322185061316
-RANDOM_FOREST,Global,Recuperado,0.5351170568561873
-RANDOM_FOREST,Hibrido_Precio_Tec,Recuperado,0.5529542920847269
-RANDOM_FOREST,Kitchen_Sink_Total,Recuperado,0.5462653288740246
-RANDOM_FOREST,Macros,Recuperado,0.5328874024526199
-RANDOM_FOREST,Precio_Puro,Recuperado,0.5373467112597548
-RANDOM_FOREST,Tecnicos,Recuperado,0.5451505016722408
-RANDOM_FOREST,Univariado,Recuperado,0.5429208472686734
-XGBOOST,Global,Recuperado,0.5730211817168339
-XGBOOST,Hibrido_Precio_Tec,Recuperado,0.5852842809364549
-XGBOOST,Kitchen_Sink_Total,Recuperado,0.5886287625418061
-XGBOOST,Macros,Recuperado,0.5652173913043478
-XGBOOST,Precio_Puro,Recuperado,0.5785953177257525
-XGBOOST,Tecnicos,Recuperado,0.5741360089186176
-XGBOOST,Univariado,Recuperado,0.5696767001114827
+ARIMAX,Global,"(10, 0, 1)",0.6101321585903083
+ARIMAX,Hibrido_Precio_Tec,"(0, 0, 0)",0.552863436123348
+ARIMAX,Kitchen_Sink_Total,"(1, 0, 0)",0.5726872246696035
+ARIMAX,Macros,"(1, 0, 0)",0.6200440528634361
+ARIMAX,Precio_Puro,"(1, 0, 0)",0.5726872246696035
+ARIMAX,Tecnicos,"(1, 0, 1)",0.5770925110132159
+ARIMAX,Univariado,"(2, 0, 2)",0.5907590759075908
+ARIMA_LSTM,Global,"{'arima_order': (5, 0, 1), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.5825991189427313
+ARIMA_LSTM,Hibrido_Precio_Tec,"{'arima_order': (5, 0, 1), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.6068281938325991
+ARIMA_LSTM,Kitchen_Sink_Total,"{'arima_order': (5, 0, 1), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.5947136563876652
+ARIMA_LSTM,Macros,"{'arima_order': (5, 0, 1), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.566079295154185
+ARIMA_LSTM,Precio_Puro,"{'arima_order': (5, 0, 1), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.5925110132158591
+ARIMA_LSTM,Tecnicos,"{'arima_order': (5, 0, 1), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.5936123348017621
+ARIMA_LSTM,Univariado,"{'arima_order': (5, 0, 1), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.6171617161716172
+BILSTM,Global,"{'units': 50, 'dropout': 0.2}",0.5797101449275363
+BILSTM,Hibrido_Precio_Tec,"{'units': 50, 'dropout': 0.2}",0.6053511705685619
+BILSTM,Kitchen_Sink_Total,"{'units': 100, 'dropout': 0.3}",0.5719063545150501
+BILSTM,Macros,"{'units': 100, 'dropout': 0.3}",0.5808249721293199
+BILSTM,Precio_Puro,"{'units': 100, 'dropout': 0.3}",0.5752508361204013
+BILSTM,Tecnicos,"{'units': 100, 'dropout': 0.3}",0.5953177257525084
+BILSTM,Univariado,"{'units': 50, 'dropout': 0.2}",0.5752508361204013
+LSTM,Global,"{'units': 100, 'dropout': 0.3}",0.5696767001114827
+LSTM,Hibrido_Precio_Tec,"{'units': 100, 'dropout': 0.3}",0.5529542920847269
+LSTM,Kitchen_Sink_Total,"{'units': 100, 'dropout': 0.3}",0.5172798216276477
+LSTM,Macros,"{'units': 50, 'dropout': 0.2}",0.5005574136008919
+LSTM,Precio_Puro,"{'units': 100, 'dropout': 0.3}",0.5674470457079153
+LSTM,Tecnicos,"{'units': 100, 'dropout': 0.3}",0.5484949832775919
+LSTM,Univariado,"{'units': 100, 'dropout': 0.3}",0.5830546265328874
+LSTM_RF,Global,"{'units': 100, 'dropout': 0.3}",0.5451505016722408
+LSTM_RF,Hibrido_Precio_Tec,"{'units': 100, 'dropout': 0.3}",0.5574136008918618
+LSTM_RF,Kitchen_Sink_Total,"{'units': 100, 'dropout': 0.3}",0.5039018952062431
+LSTM_RF,Macros,"{'units': 100, 'dropout': 0.3}",0.5340022296544036
+LSTM_RF,Precio_Puro,"{'units': 100, 'dropout': 0.3}",0.5596432552954292
+LSTM_RF,Tecnicos,"{'units': 100, 'dropout': 0.3}",0.5284280936454849
+LSTM_RF,Univariado,"{'units': 100, 'dropout': 0.3}",0.5741360089186176
+RANDOM_FOREST,Global,"{'n_estimators': 100, 'max_depth': 5}",0.5317725752508361
+RANDOM_FOREST,Hibrido_Precio_Tec,"{'n_estimators': 150, 'max_depth': 7}",0.5574136008918618
+RANDOM_FOREST,Kitchen_Sink_Total,"{'n_estimators': 100, 'max_depth': 5}",0.5317725752508361
+RANDOM_FOREST,Macros,"{'n_estimators': 150, 'max_depth': 7}",0.5395763656633222
+RANDOM_FOREST,Precio_Puro,"{'n_estimators': 150, 'max_depth': 7}",0.5451505016722408
+RANDOM_FOREST,Tecnicos,"{'n_estimators': 150, 'max_depth': 7}",0.5518394648829431
+RANDOM_FOREST,Univariado,"{'n_estimators': 100, 'max_depth': 5}",0.5295429208472687
+XGBOOST,Global,"{'n_estimators': 150, 'max_depth': 5, 'learning_rate': 0.01, 'subsample': 0.8}",0.5652173913043478
+XGBOOST,Hibrido_Precio_Tec,"{'n_estimators': 150, 'max_depth': 5, 'learning_rate': 0.01, 'subsample': 0.8}",0.5741360089186176
+XGBOOST,Kitchen_Sink_Total,"{'n_estimators': 100, 'max_depth': 3, 'learning_rate': 0.05, 'subsample': 0.8}",0.5819397993311036
+XGBOOST,Macros,"{'n_estimators': 100, 'max_depth': 3, 'learning_rate': 0.05, 'subsample': 0.8}",0.5618729096989966
+XGBOOST,Precio_Puro,"{'n_estimators': 150, 'max_depth': 5, 'learning_rate': 0.01, 'subsample': 0.8}",0.5819397993311036
+XGBOOST,Tecnicos,"{'n_estimators': 150, 'max_depth': 5, 'learning_rate': 0.01, 'subsample': 0.8}",0.5741360089186176
+XGBOOST,Univariado,"{'n_estimators': 150, 'max_depth': 5, 'learning_rate': 0.01, 'subsample': 0.8}",0.5663322185061316
