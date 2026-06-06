@@ -17,7 +17,8 @@ def scrape_ipsa_investing():
     options.headless = False # Es mejor dejarlo visible para evitar detección de bots, aunque se puede probar True
     
     try:
-        driver = uc.Chrome(options=options)
+        # Forzamos la versión 148 de Chrome que es la que tienes instalada localmente
+        driver = uc.Chrome(options=options, version_main=148)
         driver.get(url)
         print("Esperando a que cargue la tabla de datos...")
         time.sleep(10) # Esperar a que pase Cloudflare y cargue la tabla
