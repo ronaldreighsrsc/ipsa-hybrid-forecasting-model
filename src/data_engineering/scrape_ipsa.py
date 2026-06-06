@@ -29,7 +29,10 @@ def scrape_ipsa_investing():
                 if match:
                     detected_version = int(match.group(1))
                     print(f"⚠️ Detectada versión {detected_version} de Chrome instalada. Ajustando ChromeDriver...")
-                    driver = uc.Chrome(options=options, version_main=detected_version)
+                    # IMPORTANT: Selenium doesn't allow reusing the exact same options object if it failed
+                    options_retry = uc.ChromeOptions()
+                    options_retry.headless = False
+                    driver = uc.Chrome(options=options_retry, version_main=detected_version)
                 else:
                     raise e
             else:
@@ -125,6 +128,17 @@ def scrape_ipsa_investing():
         except:
             pass
         return None
+    finally:
+        # Silenciar el error visual del Garbage Collector de undetected_chromedriver en Windows
+        import sys
+        import gc
+        try:
+            old_stderr = sys.stderr
+            with open(os.devnull, 'w') as f:
+                sys.stderr = f
+                gc.collect()
+        finally:
+            sys.stderr = old_stderr
 
 if __name__ == "__main__":
     scrape_ipsa_investing()
