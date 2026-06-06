@@ -51,20 +51,21 @@ ipsa-hybrid-forecasting-model/
 
 To reproduce the thesis experiments or update the database, execute the following scripts in order:
 
-### Block 1: Master Data Updater & Preprocessing
-Updates the entire raw database (scrapes IPSA via Selenium, downloads APIs for S&P500/Copper/TPM/FXI/Yield) and automatically triggers the preprocessing pipeline. 
+### Block 1: Master Raw Data Updater
+Updates the entire raw database (scrapes IPSA via Selenium, downloads APIs for S&P500/Copper/TPM/FXI/Yield). It does NOT perform feature engineering or FFD.
 ```bash
 python src/main_updater.py
 ```
 *Note: A Google Chrome window will briefly appear to bypass Cloudflare protection for IPSA data.*
 
-*(Generates/Updates: `data/processed/ipsa_master_processed.csv`)*
+*(Updates raw CSVs in `data/raw/`)*
 
-### (Alternative) Manual Preprocessing Only
-If data is already updated, you can run only the preprocessing pipeline:
+### Block 2: Data Preprocessing & Consolidation
+Handles data ingestion from the `data/raw/` directory, performs null imputation, calculates technical indicators (MACD, RSI, ATR), models conditional volatility using EGARCH, and applies **Fractional Differencing (FFD)** to achieve stationarity while preserving long-term memory.
 ```bash
 python src/main_preprocessing.py
 ```
+*(Generates: `data/processed/ipsa_master_processed.csv`)*
 *(Generates: `data/processed/ipsa_master_processed.csv`)*
 
 ### Block 2: Ablation Study (Training)

@@ -11,7 +11,6 @@ if current_dir not in sys.path:
 # Importamos las funciones principales de nuestros módulos (POO)
 from data_engineering.scrape_ipsa import scrape_ipsa_investing
 from data_engineering.auto_updater import update_yfinance_data, update_embi, update_tpm
-from main_preprocessing import run_preprocessing_pipeline
 
 def run_step(description, func):
     print(f"\n{'='*50}")
@@ -29,8 +28,8 @@ def main():
     # Asegurar que la consola de Windows no crashee al imprimir emojis u otros caracteres especiales
     sys.stdout.reconfigure(encoding='utf-8')
     
-    print("🌟 BIENVENIDO AL SISTEMA DE ACTUALIZACIÓN MAESTRO DEL IPSA 🌟")
-    print("Este script actualizará toda la base de datos y preprocesará las variables.\n")
+    print("🌟 BIENVENIDO AL SISTEMA DE ACTUALIZACIÓN DE DATOS CRUDOS 🌟")
+    print("Este script actualizará toda la base de datos cruda desde internet.\n")
     
     # 1. Scraping del IPSA (Local Selenium)
     run_step("Paso 1: Extracción de IPSA desde Investing.com (Evasión Cloudflare)", scrape_ipsa_investing)
@@ -45,12 +44,9 @@ def main():
         
     run_step("Paso 2: Extracción de S&P500, Cobre, TPM, FXI, etc. vía APIs", update_apis)
     
-    # 3. Consolidación y Preprocesamiento (EGARCH, FFD, etc)
-    run_step("Paso 3: Preprocesamiento y Consolidación", run_preprocessing_pipeline)
-    
     print(f"\n{'='*50}")
-    print("🎉 ACTUALIZACIÓN MAESTRA COMPLETADA CON ÉXITO 🎉")
-    print("Todos los datos están listos para ser usados por main_ablation.py o main_evaluation.py.")
+    print("🎉 ACTUALIZACIÓN DE DATOS CRUDOS COMPLETADA CON ÉXITO 🎉")
+    print("NOTA: Recuerda ejecutar 'python src/main_preprocessing.py' si deseas entrenar modelos.")
     print(f"{'='*50}\n")
 
 if __name__ == "__main__":
