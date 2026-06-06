@@ -45,7 +45,7 @@ def main():
     run_step("Paso 2: Extracción de S&P500, Cobre, TPM, FXI, etc. vía APIs", update_apis)
     
     print(f"\n{'='*50}")
-    print("🎉 ACTUALIZACIÓN DE DATOS CRUDOS COMPLETADA CON ÉXITO 🎉")
+    print(" ACTUALIZACIÓN DE DATOS CRUDOS COMPLETADA CON ÉXITO ")
     print("NOTA: Recuerda ejecutar 'python src/main_preprocessing.py' si deseas entrenar modelos.")
     print(f"{'='*50}\n")
 
