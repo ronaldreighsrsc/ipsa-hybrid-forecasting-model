@@ -22,12 +22,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # ==============================================================================
 # Modelos disponibles: 'ARIMAX', 'RANDOM_FOREST', 'XGBOOST', 'LSTM', 'BILSTM', 'ARIMA_LSTM', 'LSTM_RF'
 MODELOS_A_CORRER = [
-    #'ARIMAX', 
+    'ARIMAX', 
     #'RANDOM_FOREST', 
     #'XGBOOST', 
-    'LSTM'
+    #'LSTM',
     #'BILSTM', 
-    #'ARIMA_LSTM', 
+    'ARIMA_LSTM'
     #'LSTM_RF'
 ]
 
@@ -100,7 +100,7 @@ def run_ablation():
         
         # Instanciar el Trainer correspondiente
         if nombre_modelo == 'ARIMAX':
-            trainer = ARIMAXTrainer(p_max=2, q_max=2, retrain_step=50)
+            trainer = ARIMAXTrainer(p_values=[0, 1, 2, 5, 10], q_values=[0, 1, 2], retrain_step=50)
         elif nombre_modelo == 'RANDOM_FOREST':
             trainer = RandomForestTrainer(look_back=60, retrain_step=50)
         elif nombre_modelo == 'XGBOOST':

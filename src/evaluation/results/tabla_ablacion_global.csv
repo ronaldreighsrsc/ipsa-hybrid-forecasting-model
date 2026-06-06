@@ -6,34 +6,34 @@ ARIMAX,Macros,Recuperado,0.6189427312775331
 ARIMAX,Precio_Puro,Recuperado,0.5616740088105727
 ARIMAX,Tecnicos,Recuperado,0.579295154185022
 ARIMAX,Univariado,Recuperado,0.5764576457645765
-ARIMA_LSTM,Global,Recuperado,0.6068281938325991
-ARIMA_LSTM,Hibrido_Precio_Tec,Recuperado,0.5848017621145375
-ARIMA_LSTM,Kitchen_Sink_Total,Recuperado,0.5605726872246696
-ARIMA_LSTM,Macros,Recuperado,0.5814977973568282
-ARIMA_LSTM,Precio_Puro,Recuperado,0.5903083700440529
-ARIMA_LSTM,Tecnicos,Recuperado,0.6123348017621145
-ARIMA_LSTM,Univariado,Recuperado,0.5984598459845984
-BILSTM,Global,Recuperado,0.5863991081382386
-BILSTM,Hibrido_Precio_Tec,Recuperado,0.600891861761427
-BILSTM,Kitchen_Sink_Total,Recuperado,0.5641025641025641
-BILSTM,Macros,Recuperado,0.5730211817168339
-BILSTM,Precio_Puro,Recuperado,0.5964325529542921
-BILSTM,Tecnicos,Recuperado,0.5752508361204013
-BILSTM,Univariado,Recuperado,0.5908584169453734
-LSTM,Global,Recuperado,0.5484949832775919
-LSTM,Hibrido_Precio_Tec,Recuperado,0.5607580824972129
-LSTM,Kitchen_Sink_Total,Recuperado,0.5295429208472687
-LSTM,Macros,Recuperado,0.5117056856187291
-LSTM,Precio_Puro,Recuperado,0.5585284280936454
-LSTM,Tecnicos,Recuperado,0.5117056856187291
-LSTM,Univariado,Recuperado,0.5741360089186176
-LSTM_RF,Global,Recuperado,0.5529542920847269
-LSTM_RF,Hibrido_Precio_Tec,Recuperado,0.5562987736900781
-LSTM_RF,Kitchen_Sink_Total,Recuperado,0.5161649944258639
-LSTM_RF,Macros,Recuperado,0.5306577480490524
-LSTM_RF,Precio_Puro,Recuperado,0.5518394648829431
-LSTM_RF,Tecnicos,Recuperado,0.5228539576365663
-LSTM_RF,Univariado,Recuperado,0.5607580824972129
+ARIMA_LSTM,Global,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.6035242290748899
+ARIMA_LSTM,Hibrido_Precio_Tec,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.5881057268722467
+ARIMA_LSTM,Kitchen_Sink_Total,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.5837004405286343
+ARIMA_LSTM,Macros,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.5814977973568282
+ARIMA_LSTM,Precio_Puro,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.6046255506607929
+ARIMA_LSTM,Tecnicos,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 100, 'dropout': 0.3}}",0.5958149779735683
+ARIMA_LSTM,Univariado,"{'arima_order': (2, 0, 2), 'lstm_params': {'units': 50, 'dropout': 0.2}}",0.592959295929593
+BILSTM,Global,"{'units': 50, 'dropout': 0.2}",0.5719063545150501
+BILSTM,Hibrido_Precio_Tec,"{'units': 50, 'dropout': 0.2}",0.5652173913043478
+BILSTM,Kitchen_Sink_Total,"{'units': 50, 'dropout': 0.2}",0.5752508361204013
+BILSTM,Macros,"{'units': 100, 'dropout': 0.3}",0.5875139353400223
+BILSTM,Precio_Puro,"{'units': 100, 'dropout': 0.3}",0.5763656633221851
+BILSTM,Tecnicos,"{'units': 50, 'dropout': 0.2}",0.5886287625418061
+BILSTM,Univariado,"{'units': 50, 'dropout': 0.2}",0.5841694537346711
+LSTM,Global,"{'units': 50, 'dropout': 0.2}",0.5484949832775919
+LSTM,Hibrido_Precio_Tec,"{'units': 100, 'dropout': 0.3}",0.5652173913043478
+LSTM,Kitchen_Sink_Total,"{'units': 100, 'dropout': 0.3}",0.5261984392419174
+LSTM,Macros,"{'units': 100, 'dropout': 0.3}",0.5551839464882943
+LSTM,Precio_Puro,"{'units': 100, 'dropout': 0.3}",0.5652173913043478
+LSTM,Tecnicos,"{'units': 50, 'dropout': 0.2}",0.5317725752508361
+LSTM,Univariado,"{'units': 100, 'dropout': 0.3}",0.5863991081382386
+LSTM_RF,Global,"{'units': 50, 'dropout': 0.2}",0.5128205128205128
+LSTM_RF,Hibrido_Precio_Tec,"{'units': 100, 'dropout': 0.3}",0.5719063545150501
+LSTM_RF,Kitchen_Sink_Total,"{'units': 50, 'dropout': 0.2}",0.5250836120401338
+LSTM_RF,Macros,"{'units': 50, 'dropout': 0.2}",0.5217391304347826
+LSTM_RF,Precio_Puro,"{'units': 50, 'dropout': 0.2}",0.5507246376811594
+LSTM_RF,Tecnicos,"{'units': 100, 'dropout': 0.3}",0.5395763656633222
+LSTM_RF,Univariado,"{'units': 100, 'dropout': 0.3}",0.5663322185061316
 RANDOM_FOREST,Global,Recuperado,0.5351170568561873
 RANDOM_FOREST,Hibrido_Precio_Tec,Recuperado,0.5529542920847269
 RANDOM_FOREST,Kitchen_Sink_Total,Recuperado,0.5462653288740246
