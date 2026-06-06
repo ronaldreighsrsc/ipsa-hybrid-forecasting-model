@@ -198,11 +198,24 @@ def run_ablation():
 
     # 4. Resumen Global
     if resultados_globales:
-        df_res = pd.DataFrame(resultados_globales)
-        print("\n" + "="*60 + "\n🏆 TABLA DE ABLACIÓN GLOBAL 🏆\n" + "="*60)
-        print(df_res.to_string(index=False))
-        df_res.to_csv('./src/evaluation/results/tabla_ablacion_global.csv', index=False)
-        print("\nResultados consolidados guardados en: ./src/evaluation/results/tabla_ablacion_global.csv")
+        df_new = pd.DataFrame(resultados_globales)
+        csv_path = './src/evaluation/results/tabla_ablacion_global.csv'
+        
+        if os.path.exists(csv_path):
+            df_old = pd.read_csv(csv_path)
+            # Combinar el CSV antiguo con los nuevos resultados
+            # Concatenamos poniendo los nuevos PRIMERO, y eliminamos duplicados manteniendo el primero (el nuevo)
+            df_combined = pd.concat([df_new, df_old]).drop_duplicates(subset=['Modelo', 'Banco'], keep='first')
+        else:
+            df_combined = df_new
+            
+        # Ordenar alfabéticamente para que se vea ordenado
+        df_combined = df_combined.sort_values(by=['Modelo', 'Banco'])
+        
+        print("\n" + "="*60 + "\n🏆 TABLA DE ABLACIÓN GLOBAL (ACTUALIZADA) 🏆\n" + "="*60)
+        print(df_combined.to_string(index=False))
+        df_combined.to_csv(csv_path, index=False)
+        print(f"\nResultados consolidados guardados sin borrar los anteriores en: {csv_path}")
 
 if __name__ == "__main__":
     run_ablation()

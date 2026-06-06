@@ -101,7 +101,7 @@ class LSTMTrainer:
                 
                 model_cv.fit(X_train_scaled[train_idx], y_train[train_idx], epochs=15, batch_size=32, 
                              validation_data=(X_train_scaled[val_idx], y_train[val_idx]), 
-                             callbacks=[es], verbose=0, shuffle=False)
+                             callbacks=[es], verbose=0, shuffle=True)
                 
                 preds = (model_cv.predict(X_train_scaled[val_idx], verbose=0) > 0.5).astype(int)
                 fold_accs.append(accuracy_score(y_train[val_idx], preds))
@@ -129,7 +129,7 @@ class LSTMTrainer:
 
         # Entrenamiento Base
         master_model = self._build_model((t_steps, n_feat), units=best_params['units'], dropout=best_params['dropout'])
-        master_model.fit(X_train_scaled, y_train, epochs=20, batch_size=32, verbose=0, shuffle=False)
+        master_model.fit(X_train_scaled, y_train, epochs=20, batch_size=32, verbose=0, shuffle=True)
 
         pred_probs = []
         
@@ -144,7 +144,7 @@ class LSTMTrainer:
                     print(f"    > Re-calibrando pesos en paso {i+1}/{len(X_test_scaled)}...")
                 curr_X = np.concatenate((X_train_scaled, X_test_scaled[:i+1]))
                 curr_y = np.concatenate((y_train, y_test[:i+1]))
-                master_model.fit(curr_X, curr_y, epochs=2, batch_size=32, verbose=0, shuffle=False)
+                master_model.fit(curr_X, curr_y, epochs=2, batch_size=32, verbose=0, shuffle=True)
 
         # Las redes neuronales no devuelven Feature Importance clásico
         return np.array(pred_probs), None

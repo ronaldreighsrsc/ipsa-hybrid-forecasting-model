@@ -1,6 +1,7 @@
 import streamlit as st
-from pages_utils import load_data, load_ablation_results, plot_line_chart, plot_candlestick
+from pages_utils import load_data, load_ablation_results, plot_line_chart, plot_candlestick, get_backtesting_results
 import plotly.express as px
+import plotly.graph_objects as go
 import os
 from PIL import Image
 
@@ -165,11 +166,17 @@ elif page == "Estudio de Ablación":
                      title="Comparativa de Accuracy (Test) entre Modelos y Bancos de Variables",
                      text_auto='.4f',
                      color_discrete_sequence=px.colors.qualitative.Set2)
+                     
+        # Formatear el texto dentro de las barras (negrita y tamaño)
+        fig.update_traces(
+            texttemplate='<b>%{y:.4f}</b>', 
+            textfont_size=13
+        )
         fig.update_layout(
             yaxis_title="Accuracy (Test)",
             yaxis_range=[0.45, max(df_results["Accuracy_Test"]) + 0.03],
             legend_title_text="Banco de Variables",
-            hovermode='x unified'
+            hovermode='closest'
         )
         st.plotly_chart(fig, width='stretch')
         
@@ -183,17 +190,54 @@ elif page == "Estudio de Ablación":
 # --- Página 4: Backtesting Financiero ---
 elif page == "Backtesting Financiero":
     st.markdown('<p class="main-title">Backtesting: Curvas de Equity</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-title">Evaluación por Triple Barrera</p>', unsafe_allow_html=True)
+    st.markdown('<p class="sub-title">Evaluación Financiera por Triple Barrera (Out of Sample)</p>', unsafe_allow_html=True)
     
-    st.info("""
-    Las Curvas de Equity reales se generan en la consola y se plotean localmente tras ejecutar `main_evaluation.py`.
-    Aquí podemos mostrar la Matriz de Correlación o agregar la funcionalidad de cargar los resultados financieros si se han exportado.
-    """)
-    
-    corr_img_path = 'src/evaluation/results/Matriz_Correlacion_Tesis.png'
-    if os.path.exists(corr_img_path):
-        st.subheader("Matriz de Correlación de Probabilidades")
-        image = Image.open(corr_img_path)
-        st.image(image, caption='Análisis de Multicolinealidad de los Modelos', width='stretch')
+    with st.spinner("Calculando torneo de modelos (Backtesting)..."):
+        df_summary, campeones, mkt_base = get_backtesting_results()
+        
+    if df_summary is not None and campeones is not None:
+        st.subheader("Resumen Institucional de Estrategias")
+        st.dataframe(df_summary, width='stretch')
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.subheader("Curvas de Equity (Retorno Neto Acumulado)")
+        
+        fig = go.Figure()
+        # Benchmark
+        fig.add_trace(go.Scatter(
+            x=mkt_base.index, 
+            y=mkt_base.values, 
+            mode='lines', 
+            name='Benchmark IPSA (Buy & Hold)', 
+            line=dict(color='white', width=3, dash='dash')
+        ))
+        
+        # Modelos
+        colores = px.colors.qualitative.Set2
+        for i, (mod, data) in enumerate(campeones.items()):
+            df_t = data['df_trades']
+            color = colores[i % len(colores)]
+            fig.add_trace(go.Scatter(
+                x=df_t['date'], 
+                y=df_t['cum_ret'], 
+                mode='lines', 
+                name=f"{mod.upper()} | Alpha: {data['alpha']:.2%}",
+                line=dict(width=2, color=color)
+            ))
+            
+        fig.update_layout(
+            yaxis_title="Valor de la Inversión (Base 1.0)",
+            xaxis_title="Periodo de Evaluación",
+            hovermode="x unified",
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+        st.plotly_chart(fig, width='stretch')
+        
     else:
-        st.warning("⚠️ No se encontró la imagen de correlación. Se generará al ejecutar `main_evaluation.py`.")
+        st.error("⚠️ No se encontraron predicciones (archivos .npy) para evaluar. Por favor, ejecuta el Torneo de Modelos (main_ablation.py).")

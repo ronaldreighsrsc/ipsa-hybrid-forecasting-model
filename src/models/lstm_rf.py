@@ -106,7 +106,7 @@ class LSTMRFTrainer:
                 
                 model_cv.fit(X_train_scaled[train_idx], y_train[train_idx], epochs=15, batch_size=32, 
                              validation_data=(X_train_scaled[val_idx], y_train[val_idx]), 
-                             callbacks=[es], verbose=0, shuffle=False)
+                             callbacks=[es], verbose=0, shuffle=True)
                 
                 preds = (model_cv.predict(X_train_scaled[val_idx], verbose=0) > 0.5).astype(int)
                 fold_accs.append(accuracy_score(y_train[val_idx], preds))
@@ -137,7 +137,7 @@ class LSTMRFTrainer:
 
         # 1. Entrenar LSTM Base
         master_lstm = self._build_lstm_base((t_steps, n_feat), units=best_params['units'], dropout=best_params['dropout'])
-        master_lstm.fit(X_train_scaled, y_train, epochs=20, batch_size=32, verbose=0, shuffle=False)
+        master_lstm.fit(X_train_scaled, y_train, epochs=20, batch_size=32, verbose=0, shuffle=True)
 
         # 2. Mutilar el LSTM para convertirlo en Extractor
         feature_extractor = Model(inputs=master_lstm.inputs, outputs=master_lstm.get_layer('lstm_extractor').output)
