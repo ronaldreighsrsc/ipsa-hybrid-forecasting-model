@@ -17,8 +17,24 @@ def scrape_ipsa_investing():
     options.headless = False # Es mejor dejarlo visible para evitar detección de bots, aunque se puede probar True
     
     try:
-        # Forzamos la versión 148 de Chrome que es la que tienes instalada localmente
-        driver = uc.Chrome(options=options, version_main=148)
+        # Intentamos iniciar sin especificar versión (auto-detección)
+        try:
+            driver = uc.Chrome(options=options)
+        except Exception as e:
+            error_msg = str(e)
+            if "Current browser version is" in error_msg:
+                import re
+                # Extraemos la versión principal del string de error (ej: "148" de "148.0.7778.217")
+                match = re.search(r"Current browser version is (\d+)", error_msg)
+                if match:
+                    detected_version = int(match.group(1))
+                    print(f"⚠️ Detectada versión {detected_version} de Chrome instalada. Ajustando ChromeDriver...")
+                    driver = uc.Chrome(options=options, version_main=detected_version)
+                else:
+                    raise e
+            else:
+                raise e
+                
         driver.get(url)
         print("Esperando a que cargue la tabla de datos...")
         time.sleep(10) # Esperar a que pase Cloudflare y cargue la tabla
