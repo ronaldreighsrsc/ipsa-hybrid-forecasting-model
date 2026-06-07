@@ -16,13 +16,15 @@ ipsa-hybrid-forecasting-model/
  |   |-- raw/                # Original unprocessed CSVs and Excel files.
  |   |-- processed/          # Consolidated and stationary dataset (ipsa_master_processed.csv).
  |-- src/
- |   |-- preprocessing/      # Block 1: ETL, Technical Features, Volatility (EGARCH), and FFD.
+ |   |-- data_engineering/   # Data extraction modules (scrape_ipsa.py, auto_updater.py)
+ |   |-- preprocessing/      # Block 2: ETL, Technical Features, Volatility (EGARCH), and FFD.
  |   |-- models/             # Predictive engine classes and Data Leakage prevention logic.
- |   |-- evaluation/         # Block 3: Correlation Analysis and Triple Barrier Backtesting.
+ |   |-- evaluation/         # Block 4: Correlation Analysis and Triple Barrier Backtesting.
  |   |-- dashboard/          # Interactive Streamlit Dashboard (Data Visualization).
- |   |-- main_preprocessing.py # Block 1 Orchestrator
- |   |-- main_ablation.py      # Block 2 Orchestrator (Model Tournament)
- |   |-- main_evaluation.py    # Block 3 Orchestrator (Financial Results)
+ |   |-- main_updater.py       # Block 1 Orchestrator (Raw Data extraction)
+ |   |-- main_preprocessing.py # Block 2 Orchestrator (Math and FFD)
+ |   |-- main_ablation.py      # Block 3 Orchestrator (Model Tournament)
+ |   |-- main_evaluation.py    # Block 4 Orchestrator (Financial Results)
  |-- requirements.txt      # Project dependencies
  |-- README.md
 ```
@@ -49,13 +51,23 @@ ipsa-hybrid-forecasting-model/
 
 ## Execution Workflow (Pipeline)
 
-To reproduce the thesis experiments, execute the following scripts in order:
+To reproduce the thesis experiments or update the database, execute the following scripts in order:
 
-### Block 1: Data Preprocessing
+### Block 1: Master Raw Data Updater
+Updates the entire raw database (scrapes IPSA via Selenium, downloads APIs for S&P500/Copper/TPM/FXI/Yield). It does NOT perform feature engineering or FFD.
+```bash
+python src/main_updater.py
+```
+*Note: A Google Chrome window will briefly appear to bypass Cloudflare protection for IPSA data.*
+
+*(Updates raw CSVs in `data/raw/`)*
+
+### Block 2: Data Preprocessing & Consolidation
 Handles data ingestion from the `data/raw/` directory, performs null imputation, calculates technical indicators (MACD, RSI, ATR), models conditional volatility using EGARCH, and applies **Fractional Differencing (FFD)** to achieve stationarity while preserving long-term memory.
 ```bash
 python src/main_preprocessing.py
 ```
+*(Generates: `data/processed/ipsa_master_processed.csv`)*
 *(Generates: `data/processed/ipsa_master_processed.csv`)*
 
 ### Block 2: Ablation Study (Training)

@@ -10,9 +10,9 @@ class ARIMAXTrainer:
     Motor estadístico responsable de entrenar, buscar hiperparámetros y 
     generar predicciones estep-by-step (Walk-Forward) usando ARIMAX.
     """
-    def __init__(self, p_max: int = 2, q_max: int = 2, retrain_step: int = 50):
-        self.p_max = p_max
-        self.q_max = q_max
+    def __init__(self, p_values: list = [0, 1, 2, 5, 10], q_values: list = [0, 1, 2], retrain_step: int = 50):
+        self.p_values = p_values
+        self.q_values = q_values
         self.retrain_step = retrain_step
 
     def find_best_order(self, train_target: pd.Series, train_exog: pd.DataFrame = None) -> tuple:
@@ -36,8 +36,8 @@ class ARIMAXTrainer:
 
         best_acc, best_order = -1.0, (1, 0, 1) # Default de seguridad
 
-        for p in range(self.p_max + 1):
-            for q in range(self.q_max + 1):
+        for p in self.p_values:
+            for q in self.q_values:
                 try:
                     # Atrapamos warnings matemáticos internos para no ensuciar la consola
                     with warnings.catch_warnings():

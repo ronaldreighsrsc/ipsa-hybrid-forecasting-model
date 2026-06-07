@@ -24,12 +24,15 @@ class HybridARIMALSTMTrainer:
     Fase 3: Entrena un LSTM Clasificador sobre los residuos para predecir la dirección.
     """
     def __init__(self, look_back: int = 60, retrain_step: int = 50, 
-                 n_splits: int = 3, purge_size: int = 60, embargo_size: int = 10):
+                 n_splits: int = 3, purge_size: int = 60, embargo_size: int = 10,
+                 p_values: list = [0, 1, 2, 5, 10], q_values: list = [0, 1, 2]):
         self.look_back = look_back
         self.retrain_step = retrain_step
         self.n_splits = n_splits
         self.purge_size = purge_size
         self.embargo_size = embargo_size
+        self.p_values = p_values
+        self.q_values = q_values
 
     def _get_purged_embargoed_folds(self, num_samples: int) -> list:
         """Genera índices para validación cruzada evitando Data Leakage."""
@@ -90,8 +93,8 @@ class HybridARIMALSTMTrainer:
         best_arima_order = (1, 0, 1)
         
         # Búsqueda ARIMA
-        for p in range(3):
-            for q in range(3):
+        for p in self.p_values:
+            for q in self.q_values:
                 try:
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
@@ -133,7 +136,7 @@ class HybridARIMALSTMTrainer:
                 
                 model_cv.fit(X_train_scaled[train_idx], y_train_raw[train_idx], epochs=15, batch_size=32, 
                              validation_data=(X_train_scaled[val_idx], y_train_raw[val_idx]), 
-                             callbacks=[es], verbose=0, shuffle=False)
+                             callbacks=[es], verbose=0, shuffle=True)
                 
                 preds = (model_cv.predict(X_train_scaled[val_idx], verbose=0) > 0.5).astype(int)
                 fold_accs.append(accuracy_score(y_train_raw[val_idx], preds))
@@ -175,7 +178,7 @@ class HybridARIMALSTMTrainer:
         # 3. Entrenar LSTM Maestro Inicial
         lstm_params = best_params['lstm_params']
         master_lstm = self._build_lstm_classifier((t_steps, n_feat), units=lstm_params['units'], dropout=lstm_params['dropout'])
-        master_lstm.fit(X_train_scaled, y_train_raw, epochs=20, batch_size=32, verbose=0, shuffle=False)
+        master_lstm.fit(X_train_scaled, y_train_raw, epochs=20, batch_size=32, verbose=0, shuffle=True)
 
         # Variables de estado vivas
         pred_probs = []
@@ -232,7 +235,7 @@ class HybridARIMALSTMTrainer:
                     curr_scaler.fit_transform(curr_X_arr.reshape(-1, n_feat)), -10, 10
                 ).reshape(-1, self.look_back, n_feat)
                 
-                master_lstm.fit(curr_X_scaled, np.array(y_train_list), epochs=2, batch_size=32, verbose=0, shuffle=False)
+                master_lstm.fit(curr_X_scaled, np.array(y_train_list), epochs=2, batch_size=32, verbose=0, shuffle=True)
                 scaler = curr_scaler 
 
         return np.array(pred_probs), None

@@ -27,7 +27,7 @@ class DataLoader:
         
         # 1. Cargas Básicas
         df_ipsa = self._read_file('IPSA.csv', thousands=',')
-        df_embi = self._read_file('Serie_Historica_Spread_del_EMBI.xlsx', file_type='excel')
+        df_embi = self._read_file('Serie_Historica_Spread_del_EMBI.xlsx', file_type='excel', skiprows=1)
         df_sp500 = self._read_file('S&P 500 Historical Data.csv', thousands=',')
         df_fxi = self._read_file('FXI ETF Stock Price History.csv', thousands=',')
         df_usdclp = self._read_file('USD_CLP Historical Data.csv', thousands=',')
@@ -42,7 +42,7 @@ class DataLoader:
         df_rate3m = self._read_file('IRX_2008_2025.csv')
 
         # 2. Estandarizar columnas (Renombramientos)
-        df_embi = df_embi.rename(columns={'Fecha': 'Date', 'Price': 'EMBI'})
+        df_embi = df_embi[['Fecha', 'Chile']].rename(columns={'Fecha': 'Date', 'Chile': 'EMBI'})
         df_sp500 = df_sp500.rename(columns={'Price': 'SP500'})
         df_fxi = df_fxi.rename(columns={'Price': 'FXI'})
         df_usdclp = df_usdclp.rename(columns={'Price': 'USDCLP'})
@@ -53,7 +53,7 @@ class DataLoader:
 
         # 3. Formateo de Fechas
         df_ipsa['Date'] = pd.to_datetime(df_ipsa['Date'])
-        df_embi['Date'] = pd.to_datetime(df_embi['Date'], format='%d-%b-%y', errors='coerce')
+        df_embi['Date'] = pd.to_datetime(df_embi['Date'], errors='coerce')
         df_sp500['Date'] = pd.to_datetime(df_sp500['Date'])
         df_fxi['Date'] = pd.to_datetime(df_fxi['Date'])
         df_usdclp['Date'] = pd.to_datetime(df_usdclp['Date'])
@@ -102,3 +102,4 @@ if __name__ == "__main__":
 
 
     #venv\Scripts\activate
+    #streamlit run src/dashboard/app.py
