@@ -22,13 +22,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 # ==============================================================================
 # Modelos disponibles: 'ARIMAX', 'RANDOM_FOREST', 'XGBOOST', 'LSTM', 'BILSTM', 'ARIMA_LSTM', 'LSTM_RF'
 MODELOS_A_CORRER = [
-    #'ARIMAX', 
-    #'RANDOM_FOREST', 
+    'ARIMAX', 
+    'RANDOM_FOREST', 
     'XGBOOST', 
-    'LSTM'
-    #'BILSTM',
-    #'ARIMA_LSTM',
-    #'LSTM_RF'
+    'LSTM',
+    'BILSTM',
+    'ARIMA_LSTM',
+    'LSTM_RF'
 ]
 
 # Configura aquí el nombre de la variable a predecir
