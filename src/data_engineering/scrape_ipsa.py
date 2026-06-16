@@ -6,7 +6,7 @@ import undetected_chromedriver as uc
 from datetime import datetime
 
 # ==============================================================================
-# MONKEY-PATCH: Silenciar error OSError: [WinError 6] The handle is invalid
+# Silenciar error OSError: [WinError 6] The handle is invalid
 # al destruir instancias fallidas de Chrome en Windows.
 # ==============================================================================
 original_del = getattr(uc.Chrome, '__del__', None)

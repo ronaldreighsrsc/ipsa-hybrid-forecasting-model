@@ -4,6 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 import warnings
+import joblib
 
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -120,3 +121,20 @@ class RandomForestTrainer:
         importances = importances_flat.reshape(self.look_back, num_features).sum(axis=0)
         
         return np.array(pred_probs), importances
+
+    def save(self, filepath: str) -> None:
+        """Saves the final trained model, scaler and params."""
+        state = {
+            'scaler': self.scaler,
+            'look_back': self.look_back
+        }
+        joblib.dump(state, filepath)
+        print(f"  💾 Random Forest model saved to {filepath}")
+
+    @classmethod
+    def load(cls, filepath: str):
+        """Loads a previously saved model."""
+        state = joblib.load(filepath)
+        instance = cls(look_back=state['look_back'])
+        instance.scaler = state['scaler']
+        return instance

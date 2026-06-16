@@ -53,6 +53,8 @@ class DataLoader:
 
         # 3. Formateo de Fechas
         df_ipsa['Date'] = pd.to_datetime(df_ipsa['Date'])
+        # Limpieza de fechas basura (como el Unix Epoch 1970-01-01 que viene en la primera fila)
+        df_ipsa = df_ipsa[df_ipsa['Date'] >= '2000-01-01']
         df_embi['Date'] = pd.to_datetime(df_embi['Date'], errors='coerce')
         df_sp500['Date'] = pd.to_datetime(df_sp500['Date'])
         df_fxi['Date'] = pd.to_datetime(df_fxi['Date'])
@@ -102,4 +104,4 @@ if __name__ == "__main__":
 
 
     #venv\Scripts\activate
-    #streamlit run src/dashboard/app.py
+    #streamlit run src/dashboard/app1.py
