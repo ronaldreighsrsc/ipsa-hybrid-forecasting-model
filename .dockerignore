@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+
+.git/
+.github/
+
+data/
+src/evaluation/results/
+
+.vscode/
+.idea/
+
+models/ablation_candidates/
+models/saved_models/

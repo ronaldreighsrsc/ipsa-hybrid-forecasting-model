@@ -15,6 +15,7 @@ from keras.callbacks import EarlyStopping
 from keras.optimizers import Adam
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
+import joblib
 
 class HybridARIMALSTMTrainer:
     """
@@ -238,4 +239,35 @@ class HybridARIMALSTMTrainer:
                 master_lstm.fit(curr_X_scaled, np.array(y_train_list), epochs=2, batch_size=32, verbose=0, shuffle=True)
                 scaler = curr_scaler 
 
+        self.model_arima_curr = model_arima_curr
+        self.master_lstm = master_lstm
+        self.scaler = scaler # guardamos el último scaler usado
         return np.array(pred_probs), None
+
+    def save(self, filepath: str) -> None:
+        """Saves the final trained models (ARIMA and LSTM), scaler and params."""
+        if not hasattr(self, 'master_lstm') or not hasattr(self, 'model_arima_curr'):
+            raise ValueError("No model trained yet. Run walk_forward_predict first.")
+            
+        keras_path = filepath.replace(".pkl", ".keras")
+        self.master_lstm.save(keras_path)
+        
+        state = {
+            'scaler': self.scaler,
+            'look_back': self.look_back,
+            'model_arima_curr': self.model_arima_curr
+        }
+        joblib.dump(state, filepath)
+        print(f"  💾 ARIMA-LSTM model saved to {filepath} and {keras_path}")
+
+    @classmethod
+    def load(cls, filepath: str):
+        """Loads a previously saved model."""
+        state = joblib.load(filepath)
+        keras_path = filepath.replace(".pkl", ".keras")
+        
+        instance = cls(look_back=state['look_back'])
+        instance.scaler = state['scaler']
+        instance.model_arima_curr = state['model_arima_curr']
+        instance.master_lstm = tf.keras.models.load_model(keras_path)
+        return instance

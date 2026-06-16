@@ -4,6 +4,7 @@ import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
 import warnings
+import joblib
 
 warnings.filterwarnings("ignore")
 
@@ -118,3 +119,22 @@ class XGBoostTrainer:
         importances = importances_flat.reshape(self.look_back, num_features).sum(axis=0)
         
         return np.array(pred_probs), importances
+
+    def save(self, filepath: str) -> None:
+        """Saves the final trained model, scaler and params."""
+        state = {
+            'model': master_model if hasattr(self, '_master_model') else None,
+            'scaler': self.scaler,
+            'look_back': self.look_back
+        }
+        joblib.dump(state, filepath)
+        print(f"  💾 XGBoost model saved to {filepath}")
+
+    @classmethod
+    def load(cls, filepath: str):
+        """Loads a previously saved model."""
+        state = joblib.load(filepath)
+        instance = cls(look_back=state['look_back'])
+        instance.scaler = state['scaler']
+        instance._master_model = state['model']
+        return instance

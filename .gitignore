@@ -7,6 +7,13 @@ data/
 
 # Archivos ocultos del sistema
 .DS_Store
+
+# Saved models (heavy binary files)
+models/ablation_candidates/
+models/production/
+models/saved_models/
+*.pkl
+*.keras
 # Selenium and scraping caches
 __pycache__/
 *.log

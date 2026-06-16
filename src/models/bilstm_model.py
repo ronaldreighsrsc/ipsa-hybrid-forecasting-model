@@ -14,6 +14,7 @@ from keras.callbacks import EarlyStopping
 from keras.optimizers import Adam
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
+import joblib
 
 class BiLSTMTrainer:
     """
@@ -156,5 +157,33 @@ class BiLSTMTrainer:
                 curr_y = np.concatenate((y_train, y_test[:i+1]))
                 master_model.fit(curr_X, curr_y, epochs=2, batch_size=32, verbose=0, shuffle=True)
 
+        # Guardar el modelo final entrenado en la instancia
+        self.master_model = master_model
         # Las redes neuronales no devuelven Feature Importance clásico
         return np.array(pred_probs), None
+
+    def save(self, filepath: str) -> None:
+        """Saves the final trained model, scaler and params."""
+        if not hasattr(self, 'master_model'):
+            raise ValueError("No model trained yet. Run walk_forward_predict first.")
+            
+        keras_path = filepath.replace(".pkl", ".keras")
+        self.master_model.save(keras_path)
+        
+        state = {
+            'scaler': self.scaler,
+            'look_back': self.look_back
+        }
+        joblib.dump(state, filepath)
+        print(f"  💾 BiLSTM model saved to {filepath} and {keras_path}")
+
+    @classmethod
+    def load(cls, filepath: str):
+        """Loads a previously saved model."""
+        state = joblib.load(filepath)
+        keras_path = filepath.replace(".pkl", ".keras")
+        
+        instance = cls(look_back=state['look_back'])
+        instance.scaler = state['scaler']
+        instance.master_model = tf.keras.models.load_model(keras_path)
+        return instance

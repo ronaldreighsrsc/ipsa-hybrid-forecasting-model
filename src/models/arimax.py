@@ -100,7 +100,6 @@ class ARIMAXTrainer:
             prob = 1.0 - norm.cdf(p_val, loc=mean, scale=se)
             pred_probs.append(prob)
             
-            # 3. Reentrenamiento Periódico
             if (i + 1) % self.retrain_step == 0:
                 t_t_upd = target.iloc[:train_size + i + 1]
                 t_e_upd = exog.iloc[:train_size + i + 1] if exog is not None and not exog.empty else None
@@ -109,4 +108,34 @@ class ARIMAXTrainer:
                     warnings.simplefilter("ignore")
                     curr_model = ARIMA(t_t_upd, exog=t_e_upd, order=best_order).fit()
 
+        self.curr_model = curr_model
         return np.array(pred_probs)
+
+    def save(self, filepath: str) -> None:
+        """Saves the final trained model."""
+        if not hasattr(self, 'curr_model'):
+            raise ValueError("No model trained yet. Run walk_forward_predict first.")
+            
+        import joblib
+        state = {
+            'model': self.curr_model,
+            'p_values': self.p_values,
+            'q_values': self.q_values,
+            'retrain_step': self.retrain_step
+        }
+        joblib.dump(state, filepath)
+        print(f"  💾 ARIMAX model saved to {filepath}")
+
+    @classmethod
+    def load(cls, filepath: str):
+        """Loads a previously saved model."""
+        import joblib
+        state = joblib.load(filepath)
+        
+        instance = cls(
+            p_values=state['p_values'],
+            q_values=state['q_values'],
+            retrain_step=state['retrain_step']
+        )
+        instance.curr_model = state['model']
+        return instance

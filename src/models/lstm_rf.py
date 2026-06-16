@@ -15,6 +15,7 @@ from keras.optimizers import Adam
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
+import joblib
 
 class LSTMRFTrainer:
     """
@@ -167,4 +168,34 @@ class LSTMRFTrainer:
 
         # Retornamos probabilidades. (La importancia de variables del RF aquí no es interpretable
         # directamente porque son "neuronas ocultas", por lo que devolvemos None).
+        self.rf_model = rf_model
+        self.feature_extractor = feature_extractor
         return np.array(pred_probs), None
+
+    def save(self, filepath: str) -> None:
+        """Saves the final trained models (RF and LSTM extractor), scaler and params."""
+        if not hasattr(self, 'rf_model') or not hasattr(self, 'feature_extractor'):
+            raise ValueError("No model trained yet. Run walk_forward_predict first.")
+            
+        keras_path = filepath.replace(".pkl", ".keras")
+        self.feature_extractor.save(keras_path)
+        
+        state = {
+            'scaler': self.scaler,
+            'look_back': self.look_back,
+            'rf_model': self.rf_model
+        }
+        joblib.dump(state, filepath)
+        print(f"  💾 LSTM-RF model saved to {filepath} and {keras_path}")
+
+    @classmethod
+    def load(cls, filepath: str):
+        """Loads a previously saved model."""
+        state = joblib.load(filepath)
+        keras_path = filepath.replace(".pkl", ".keras")
+        
+        instance = cls(look_back=state['look_back'])
+        instance.scaler = state['scaler']
+        instance.rf_model = state['rf_model']
+        instance.feature_extractor = tf.keras.models.load_model(keras_path)
+        return instance

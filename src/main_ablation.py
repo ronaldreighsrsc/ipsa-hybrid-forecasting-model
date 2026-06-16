@@ -6,6 +6,7 @@ from sklearn.metrics import accuracy_score
 import tensorflow as tf
 
 # Importación de todos los motores predictivos
+import json
 from models.arimax import ARIMAXTrainer
 from models.random_forest import RandomForestTrainer
 from models.xgb_model import XGBoostTrainer
@@ -92,6 +93,12 @@ def run_ablation():
         TARGET_COL = 'Price'
 
     os.makedirs("./src/evaluation/results", exist_ok=True)
+    os.makedirs("./models/ablation_candidates", exist_ok=True)
+    
+    # Exportar el mapa de features para que la API sepa qué variables requiere cada banco
+    with open("./models/features_map.json", "w") as f:
+        json.dump(bancos, f, indent=4)
+        
     resultados_globales = []
 
     # 2. Iteración de Modelos
@@ -183,6 +190,12 @@ def run_ablation():
                             print(f"    - {valid_features[idx - 1]}: {importances[idx]:.2%}")
 
             print(f"✅ Exactitud Final OOS ({nombre_modelo} - {nombre_banco}): {final_acc:.2%}")
+            
+            # Guardar TODOS los candidatos para el Model Registry
+            try:
+                trainer.save(f"./models/ablation_candidates/{nombre_modelo.lower()}_{nombre_banco.lower()}.pkl")
+            except Exception as e:
+                print(f"⚠️ No se pudo guardar el modelo: {e}")
             
             # Guardar resultados
             resultados_globales.append({

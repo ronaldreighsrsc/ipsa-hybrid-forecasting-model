@@ -1,4 +1,7 @@
+import matplotlib.pyplot as plt
 import os
+import json
+import shutil
 import warnings
 from evaluation.triple_barrera import TripleBarrierBacktester
 from evaluation.correlation_analyzer import CorrelationAnalyzer
@@ -51,10 +54,27 @@ def run_evaluation_pipeline():
     # 4. Ejecutar el Backtest
     campeones, df_raw = tester.run_tournament(modelos, bancos)
 
-    # 5. Imprimir Tabla de Resumen (Formato Institucional)
+    # 5. Imprimir Tabla de Resumen y Exportar Model Registry
     if campeones:
         tester.print_summary_table(campeones, df_raw)
         
+        print("\n💾 Guardando Model Registry...")
+        os.makedirs("./models", exist_ok=True)
+        registry = {}
+        for mod, data in campeones.items():
+            registry[f"{mod.lower()}"] = {
+                "banco": data['banco'],
+                "alpha": data['alpha'],
+                "ret_est": data['ret_est'],
+                "trades": data['trades'],
+                "win_rate": data['win_rate'],
+                "metrics": data['metrics'] # Incluye Sharpe, VaR, MDD, etc.
+            }
+            
+        with open("./models/registry.json", "w") as f:
+            json.dump(registry, f, indent=4)
+        print("✅ Registry exportado en ./models/registry.json")
+
         # 6. Graficar Resultados
         print("📊 Generando gráfico maestro de rendimiento (Cierra la ventana del gráfico para terminar el script)...")
         tester.plot_results(campeones)
