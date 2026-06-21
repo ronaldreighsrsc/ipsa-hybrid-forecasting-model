@@ -1,0 +1,46 @@
+{
+    "Univariado": [],
+    "Macros": [
+        "TPM",
+        "EMBI",
+        "Copper_FFD",
+        "Yield10Y_FFD"
+    ],
+    "Tecnicos": [
+        "MACD_Hist",
+        "RSI",
+        "ATR",
+        "EGARCH_Vol"
+    ],
+    "Precio_Puro": [
+        "Open_FFD",
+        "High_FFD",
+        "Low_FFD"
+    ],
+    "Hibrido_Precio_Tec": [
+        "Open_FFD",
+        "High_FFD",
+        "Low_FFD",
+        "EGARCH_Vol",
+        "RSI"
+    ],
+    "Global": [
+        "SP500_FFD",
+        "VIX",
+        "FXI"
+    ],
+    "Kitchen_Sink_Total": [
+        "SP500_FFD",
+        "FXI",
+        "USDCLP_FFD",
+        "Yield10Y_FFD",
+        "EMBI",
+        "VIX",
+        "TPM",
+        "Copper_FFD",
+        "MACD_Hist",
+        "RSI",
+        "EGARCH_Vol",
+        "ATR"
+    ]
+}

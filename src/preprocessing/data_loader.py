@@ -43,6 +43,8 @@ class DataLoader:
 
         # 2. Estandarizar columnas (Renombramientos)
         df_embi = df_embi[['Fecha', 'Chile']].rename(columns={'Fecha': 'Date', 'Chile': 'EMBI'})
+        # Retraso operativo simulado de 3 días para EMBI para evitar Publication Lag en producción
+        df_embi['EMBI'] = df_embi['EMBI'].shift(3)
         df_sp500 = df_sp500.rename(columns={'Price': 'SP500'})
         df_fxi = df_fxi.rename(columns={'Price': 'FXI'})
         df_usdclp = df_usdclp.rename(columns={'Price': 'USDCLP'})

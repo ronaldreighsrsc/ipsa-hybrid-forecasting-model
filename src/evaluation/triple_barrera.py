@@ -43,10 +43,13 @@ class TripleBarrierBacktester:
         cvar_level = returns[returns <= var_level].mean() if len(returns[returns <= var_level]) > 0 else 0
         starr = mean_ret / abs(cvar_level) if cvar_level != 0 else 0
         
+        # PSR (López de Prado): Usa el Sharpe Diario y sus momentos estadísticos
         n = len(returns)
+        daily_sharpe = mean_ret / std_ret if std_ret != 0 else 0
         skew_ret, kurt_ret = skew(returns), kurtosis(returns)
-        sigma_sr = np.sqrt((1 / (n - 1)) * (1 + 0.5 * sharpe**2 - skew_ret * sharpe + (kurt_ret / 4) * sharpe**2))
-        psr = norm.cdf(sharpe / sigma_sr) if sigma_sr != 0 else 0
+        # Benchmark Sharpe = 0 por defecto
+        sigma_sr = np.sqrt((1 / (n - 1)) * (1 + 0.5 * daily_sharpe**2 - skew_ret * daily_sharpe + (kurt_ret / 4) * daily_sharpe**2))
+        psr = norm.cdf(daily_sharpe / sigma_sr) if sigma_sr != 0 else 0
         
         cum_series = pd.Series(cum_returns)
         running_max = cum_series.cummax()
@@ -70,15 +73,15 @@ class TripleBarrierBacktester:
         dates = df.index
         results = []
         
-        for i in range(len(closes) - self.max_hold - 1):
+        for i in range(len(closes) - self.max_hold + 1):
             if probabilities[i] > 0.5:
-                entry_price = opens[i + 1] 
+                entry_price = opens[i] 
                 vol_entry = vols[i] 
                 
                 tp_level = entry_price * (1 + self.k_up * (vol_entry/100))
                 sl_level = entry_price * (1 - self.k_down * (vol_entry/100))
                 
-                for j in range(1, self.max_hold + 1):
+                for j in range(self.max_hold):
                     curr_close = closes[i + j]
                     curr_high = highs[i + j]
                     curr_low = lows[i + j]
@@ -101,7 +104,7 @@ class TripleBarrierBacktester:
                         net_ret = (1 + raw_ret) * (1 - self.costo_movimiento)**2 - 1
                         results.append({'date': dates[i+j], 'ret': net_ret, 'type': 'SL'})
                         break
-                    elif j == self.max_hold:
+                    elif j == self.max_hold - 1:
                         raw_ret = (curr_close / entry_price) - 1
                         net_ret = (1 + raw_ret) * (1 - self.costo_movimiento)**2 - 1
                         results.append({'date': dates[i+j], 'ret': net_ret, 'type': 'TIME'})
@@ -151,7 +154,7 @@ class TripleBarrierBacktester:
                                 'trades': len(trade_results),
                                 'win_rate': len(trade_results[trade_results['ret'] > 0]) / len(trade_results),
                                 'metrics': metrics,
-                                'df_trades': trade_results[['date', 'cum_ret']].copy(),
+                                'df_trades': trade_results[['date', 'cum_ret', 'ret']].copy(),
                                 'df_mkt': mkt_equity.copy()
                             }
                             
@@ -166,9 +169,9 @@ class TripleBarrierBacktester:
             print("⚠️ No hay campeones para mostrar en la tabla.")
             return
 
-        print("\n" + "="*105)
-        print(f"{'MODELO':<12} | {'BANCO GANADOR':<18} | {'ALPHA NETO':<10} | {'RET_NETO':<9} | {'TRADES':<6} | {'WIN_%':<6} | {'SHARPE':<7} | {'MDD'} | {'CVaR_95'} | {'STARR'}")
-        print("-" * 105)
+        print("\n" + "="*115)
+        print(f"{'MODELO':<12} | {'BANCO GANADOR':<18} | {'ALPHA NETO':<10} | {'RET_NETO':<9} | {'TRADES':<6} | {'WIN_%':<6} | {'SHARPE':<7} | {'MDD'} | {'CVaR_95'} | {'STARR'} | {'PSR'}")
+        print("-" * 115)
 
         primer_mod = list(campeones.keys())[0]
         mkt_base = campeones[primer_mod]['df_mkt']
@@ -176,32 +179,51 @@ class TripleBarrierBacktester:
         
         mkt_metrics = self.calculate_advanced_metrics(mkt_returns, df_raw.iloc[-len(mkt_base):].index, mkt_base.values)
         
-        print(f"{'BENCHMARK':<12} | {'IPSA (B&H)':<18} | {'0.00%':>10} | {mkt_base.values[-1]-1:>8.2%} | {'-':>6} | {'-':>6} | {mkt_metrics['Sharpe']:>7.2f} | {mkt_metrics['MDD']:>7.2%} | {mkt_metrics['CVaR_95']:>7.2%} | {mkt_metrics['STARR']:>7.2f}")
-        print("-" * 105)
+        print(f"{'BENCHMARK':<12} | {'IPSA (B&H)':<18} | {'0.00%':>10} | {mkt_base.values[-1]-1:>8.2%} | {'-':>6} | {'-':>6} | {mkt_metrics['Sharpe']:>7.2f} | {mkt_metrics['MDD']:>7.2%} | {mkt_metrics['CVaR_95']:>7.2%} | {mkt_metrics['STARR']:>7.2f} | {mkt_metrics['PSR']:>5.2f}")
+        print("-" * 115)
 
         for mod, data in campeones.items():
             m = data['metrics']
-            print(f"{mod.upper():<12} | {data['banco']:<18} | {data['alpha']:>9.2%} | {data['ret_est']:>8.2%} | {data['trades']:>6} | {data['win_rate']:>5.1%} | {m['Sharpe']:>7.2f} | {m['MDD']:>7.2%} | {m['CVaR_95']:>7.2%} | {m['STARR']:>7.2f}")
-        print("="*105)
+            print(f"{mod.upper():<12} | {data['banco']:<18} | {data['alpha']:>9.2%} | {data['ret_est']:>8.2%} | {data['trades']:>6} | {data['win_rate']:>5.1%} | {m['Sharpe']:>7.2f} | {m['MDD']:>7.2%} | {m['CVaR_95']:>7.2%} | {m['STARR']:>7.2f} | {m['PSR']:>5.2f}")
+        print("="*115)
 
-    def plot_results(self, campeones):
+    def plot_results(self, campeones, rolling_window: int = 60):
         if not campeones:
             print("⚠️ No hay campeones para graficar.")
             return
 
-        plt.figure(figsize=(14, 8))
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 12), gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
         primer_mod = list(campeones.keys())[0]
         mkt_base = campeones[primer_mod]['df_mkt']
-        plt.plot(mkt_base.index, mkt_base.values, color='black', label='Benchmark IPSA (Buy & Hold)', linestyle='--', linewidth=2.5, zorder=5)
+        
+        # Plot 1: Equity Curve
+        ax1.plot(mkt_base.index, mkt_base.values, color='black', label='Benchmark IPSA (Buy & Hold)', linestyle='--', linewidth=2.5, zorder=5)
 
         for idx, (mod, data) in enumerate(campeones.items()):
             df_t = data['df_trades']
-            plt.plot(df_t['date'], df_t['cum_ret'], label=f"{mod.upper()} | Alpha: {data['alpha']:.1%}", linewidth=1.5, alpha=0.9)
+            ax1.plot(df_t['date'], df_t['cum_ret'], label=f"{mod.upper()} | Alpha: {data['alpha']:.1%}", linewidth=1.5, alpha=0.9)
+            
+            # Plot 2: Rolling Sharpe
+            if 'ret' in df_t.columns and len(df_t) >= rolling_window:
+                # Convertir 'date' al index temporal para graficar correctamente
+                df_t_roll = df_t.set_index('date')
+                # Sharpe rodante de los últimos N trades, anualizado (~252 días de trading)
+                rolling_mean = df_t_roll['ret'].rolling(window=rolling_window).mean()
+                rolling_std = df_t_roll['ret'].rolling(window=rolling_window).std()
+                rolling_sharpe = (rolling_mean / rolling_std) * np.sqrt(252)
+                ax2.plot(df_t_roll.index, rolling_sharpe, label=f"{mod.upper()}", linewidth=1.5, alpha=0.7)
 
-        plt.title(f'Evaluación de Desempeño Neto (Fricción: {self.costo_movimiento*2:.2%})', fontsize=14, pad=20)
-        plt.ylabel('Valor de la Inversión (Base 1.0)', fontsize=12)
-        plt.xlabel('Periodo de Evaluación', fontsize=12)
-        plt.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Estrategias", frameon=True)
-        plt.grid(True, which='major', linestyle=':', alpha=0.6)
+        ax1.set_title(f'Evaluación de Desempeño Neto (Fricción: {self.costo_movimiento*2:.2%})', fontsize=14, pad=10)
+        ax1.set_ylabel('Valor de la Inversión (Base 1.0)', fontsize=12)
+        ax1.legend(loc='upper left', bbox_to_anchor=(1, 1), title="Estrategias", frameon=True)
+        ax1.grid(True, which='major', linestyle=':', alpha=0.6)
+        
+        ax2.set_title(f'Rolling Sharpe Ratio (Ventana: {rolling_window} trades)', fontsize=12, pad=10)
+        ax2.set_ylabel('Sharpe Ratio Anualizado', fontsize=12)
+        ax2.set_xlabel('Periodo de Evaluación', fontsize=12)
+        ax2.axhline(y=0, color='red', linestyle='--', alpha=0.5)
+        ax2.axhline(y=1.0, color='green', linestyle=':', alpha=0.5)
+        ax2.grid(True, which='major', linestyle=':', alpha=0.6)
+
         plt.tight_layout()
         plt.show()

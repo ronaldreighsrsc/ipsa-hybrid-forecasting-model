@@ -112,8 +112,12 @@ class FractionalDifferencer:
             else:
                 print(f"  [PROCESAR] {col} NO es estacionaria (p={p_value:.4f}). Buscando d*...")
                 
-                # 2. Encontrar d óptimo y aplicar FFD
-                d_optimo, corr = self._find_optimal_d(serie_limpia)
+                # 2. Encontrar d óptimo SOLO con los datos de entrenamiento (80% inicial)
+                # Esto evita el Look-Ahead Bias en la calibración de la estacionariedad
+                train_size = int(len(serie_limpia) * 0.8)
+                serie_train = serie_limpia.iloc[:train_size]
+                
+                d_optimo, corr = self._find_optimal_d(serie_train)
                 nueva_col = f"{col}_FFD"
                 df_calc[nueva_col] = self._frac_diff_ffd(serie_limpia, d_optimo)
                 
